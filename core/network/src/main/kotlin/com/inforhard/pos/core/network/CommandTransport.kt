@@ -12,9 +12,12 @@ fun interface CommandTransport {
     fun send(command: LocalCommand): TransportResult
 }
 
+fun interface ReconciliationTransport {
+    fun reconcile(command: LocalCommand): TransportResult
+}
+
 class FakeCommandTransport(
     private val result: TransportResult = TransportResult.Uncertain,
 ) : CommandTransport {
     override fun send(command: LocalCommand): TransportResult = result
 }
-

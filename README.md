@@ -19,6 +19,7 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - `core:network`: interfaz de transporte y fake local.
 - `core:security`: interfaz para identidad protegida por Keystore.
 - `core:hardware`: contratos de hardware y compatibilidad inicial HID.
+- `core:sync`: coordinación local de cola y reconciliación contra fakes.
 
 ## Seguridad local implementada
 
@@ -39,5 +40,8 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
   validarse en los equipos reales.
 - El shell Compose recibe la captura HID y muestra el barcode solamente como
   evidencia local. No ejecuta lookup, Pricing, venta ni llamadas de red.
+- La cola en memoria conserva `Idempotency-Key`, convierte timeout en
+  `uncertain` y consulta mediante una interfaz de reconciliación antes de
+  cualquier reenvío. Room y WorkManager todavía no están implementados.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
