@@ -43,5 +43,9 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - La cola en memoria conserva `Idempotency-Key`, convierte timeout en
   `uncertain` y consulta mediante una interfaz de reconciliación antes de
   cualquier reenvío. Room y WorkManager todavía no están implementados.
+- La política offline permite borradores puramente locales y niega toda
+  operación remota sin capacidad vigente y verificada. Pagos, reembolsos,
+  reversiones, liquidaciones, administración y fiscalidad permanecen siempre
+  bloqueados offline, incluso si una capacidad sintética intentara listarlos.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
