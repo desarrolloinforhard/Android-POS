@@ -49,6 +49,7 @@ android {
 
 dependencies {
     implementation(project(":core:domain"))
+    implementation(project(":core:hardware"))
     implementation(project(":core:network"))
     implementation(project(":core:security"))
     implementation(libs.androidx.core.ktx)
@@ -59,4 +60,5 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    testImplementation(libs.junit)
 }

@@ -37,5 +37,7 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Scanner HID/teclado encapsulado detrás de una interfaz, con terminación por
   Enter, cancelación y límite defensivo. La compatibilidad definitiva debe
   validarse en los equipos reales.
+- El shell Compose recibe la captura HID y muestra el barcode solamente como
+  evidencia local. No ejecuta lookup, Pricing, venta ni llamadas de red.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
