@@ -20,4 +20,4 @@ include(":core:model")
 include(":core:domain")
 include(":core:network")
 include(":core:security")
-
+include(":core:hardware")

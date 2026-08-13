@@ -18,6 +18,7 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - `core:domain`: políticas y máquina de estados.
 - `core:network`: interfaz de transporte y fake local.
 - `core:security`: interfaz para identidad protegida por Keystore.
+- `core:hardware`: contratos de hardware y compatibilidad inicial HID.
 
 ## Seguridad local implementada
 
@@ -33,5 +34,8 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Revocación conserva el conteo de comandos pendientes y bloquea la sesión.
 - Fake de enrolamiento que responde `ContractUnavailable` sin definir rutas ni
   payloads.
+- Scanner HID/teclado encapsulado detrás de una interfaz, con terminación por
+  Enter, cancelación y límite defensivo. La compatibilidad definitiva debe
+  validarse en los equipos reales.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
