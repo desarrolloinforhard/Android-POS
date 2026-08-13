@@ -27,5 +27,11 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Firma local `SHA256withECDSA`; el formato PoP remoto continúa pendiente de
   contrato y no está implementado.
 - `Idempotency-Key` local con 128 bits completos codificados en hexadecimal.
+- Estado local separado para identidad del dispositivo y sesión del operador.
+- Contexto de empresa, sucursal y terminal representado como derivado por
+  servidor y no editable como autoridad local.
+- Revocación conserva el conteo de comandos pendientes y bloquea la sesión.
+- Fake de enrolamiento que responde `ContractUnavailable` sin definir rutas ni
+  payloads.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
