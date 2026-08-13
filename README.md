@@ -47,5 +47,8 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
   operación remota sin capacidad vigente y verificada. Pagos, reembolsos,
   reversiones, liquidaciones, administración y fiscalidad permanecen siempre
   bloqueados offline, incluso si una capacidad sintética intentara listarlos.
+- La evidencia diagnóstica admite identificadores técnicos seguros, intentos y
+  mensajes acotados. Un sanitizador elimina credenciales, bearer, bootstrap,
+  contraseñas, tokens y secretos antes de cualquier registro futuro.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
