@@ -7,4 +7,3 @@ interface DeviceKeyStore {
     fun sign(payload: ByteArray): ByteArray
     fun hasKey(): Boolean
 }
-

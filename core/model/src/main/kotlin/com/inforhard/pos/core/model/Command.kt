@@ -16,7 +16,6 @@ enum class CommandState {
 
 data class LocalCommand(
     val localId: UUID,
-    val idempotencyKey: UUID,
+    val idempotencyKey: IdempotencyKey,
     val state: CommandState,
 )
-

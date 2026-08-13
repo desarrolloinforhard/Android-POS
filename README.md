@@ -19,5 +19,13 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - `core:network`: interfaz de transporte y fake local.
 - `core:security`: interfaz para identidad protegida por Keystore.
 
-No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
+## Seguridad local implementada
 
+- Adapter Android Keystore con clave EC privada no exportable.
+- Preferencia por StrongBox en Android 9 o superior y fallback explícito al
+  proveedor Android Keystore cuando StrongBox no está disponible.
+- Firma local `SHA256withECDSA`; el formato PoP remoto continúa pendiente de
+  contrato y no está implementado.
+- `Idempotency-Key` local con 128 bits completos codificados en hexadecimal.
+
+No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
