@@ -50,5 +50,8 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - La evidencia diagnóstica admite identificadores técnicos seguros, intentos y
   mensajes acotados. Un sanitizador elimina credenciales, bearer, bootstrap,
   contraseñas, tokens y secretos antes de cualquier registro futuro.
+- Modelos candidatos de catálogo, carrito y Pricing viven sólo en el dominio
+  Android. Un catálogo fixture y un motor fake recalculan el carrito completo,
+  acumulan scans por producto y rechazan precedencias ambiguas.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
