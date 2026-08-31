@@ -21,6 +21,7 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - `core:hardware`: contratos de hardware y compatibilidad inicial HID.
 - `core:sync`: coordinación local de cola y reconciliación contra fakes.
 - `core:persistence`: spike Room aislado con datos sintéticos y migraciones.
+- `core:work`: adapter WorkManager aislado, sin conexión a la app ni transporte.
 
 ## Seguridad local implementada
 
@@ -45,7 +46,11 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - La cola de dominio conserva `Idempotency-Key`, convierte timeout en
   `uncertain` y consulta mediante una interfaz de reconciliación antes de
   cualquier reenvío. Room V4 implementa persistencia durable de su metadata;
-  WorkManager todavía no está implementado.
+  un planificador puro bloquea envíos pendientes mientras exista incertidumbre.
+- El adapter WorkManager `piloto` agenda trabajo único con red conectada,
+  política `KEEP` y backoff exponencial de 30 segundos. Requiere un delegado y
+  una `WorkerFactory` explícitos; no está conectado a `app`, no define rutas y
+  no puede ejecutar transporte real por sí mismo.
 - La política offline permite borradores puramente locales y niega toda
   operación remota sin capacidad vigente y verificada. Pagos, reembolsos,
   reversiones, liquidaciones, administración y fiscalidad permanecen siempre
@@ -89,6 +94,7 @@ No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 - [Flujo de arquitectura Draw.io](docs/flujo-autoservicio-api-first.drawio)
 - [Matriz de Pricing determinista](docs/matriz-pricing-determinista.md)
 - [ADR-003: Room, cifrado y migraciones](docs/adr-003-room-cifrado-migraciones.md)
+- [ADR-004: WorkManager y reintentos](docs/adr-004-workmanager-reintentos.md)
 - [Flujo de persistencia local A3](docs/persistencia-local-a3.drawio)
 
 Los documentos publicados son una instantánea informativa. El registro oficial
