@@ -29,6 +29,8 @@ kapt {
 }
 
 dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:sync"))
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)

@@ -35,3 +35,9 @@ o secreto persistido.
 - Base V3 con metadata de snapshots exclusivamente sintética, publicación
   atómica y rollback local: `implementado`; no representa catálogo ni Pricing
   productivos. Las 5 pruebas V3 pasaron en X-3566 con Android 11.
+- Incremento V4: outbox durable sin payload comercial; sólo UUID local,
+  `Idempotency-Key` y estado. La misma clave no puede mutar y `uncertain` debe
+  sobrevivir el cierre y reapertura de la base: `implementado`. Las 8 pruebas
+  instrumentadas V4 pasaron en X-3566 con Android 11. Para destrabar el
+  verificador externo del firmware se desactivó sólo durante la instalación
+  ADB y sus ajustes se restauraron al estado previo; el APK temporal se retiró.

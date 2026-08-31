@@ -4,6 +4,10 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.inforhard.pos.core.model.CommandState
+import com.inforhard.pos.core.model.IdempotencyKey
+import com.inforhard.pos.core.model.LocalCommand
+import java.util.UUID
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -103,6 +107,62 @@ class SyntheticPilotDatabaseTest {
     }
 
     @Test
+    fun migratesVersionThreeToFourWithEmptyDurableOutbox() {
+        context.openOrCreateDatabase(databaseName, Context.MODE_PRIVATE, null).use { database ->
+            database.execSQL(
+                "CREATE TABLE synthetic_records (recordId TEXT NOT NULL PRIMARY KEY, label TEXT NOT NULL, revision INTEGER NOT NULL)",
+            )
+            database.execSQL(
+                "CREATE TABLE synthetic_snapshots (snapshotId TEXT NOT NULL PRIMARY KEY, sequence INTEGER NOT NULL, checksum TEXT NOT NULL, active INTEGER NOT NULL)",
+            )
+            database.version = 3
+        }
+
+        val database = openDatabase()
+        try {
+            assertEquals(emptyList<LocalCommandEntity>(), database.commands().findByState(CommandState.UNCERTAIN.name))
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
+    fun uncertainCommandAndStableIdempotencySurviveDatabaseReopen() {
+        val localId = UUID.randomUUID()
+        val key = IdempotencyKey("0123456789abcdef0123456789abcdef")
+        val database = openDatabase()
+        RoomCommandRepository(database).save(LocalCommand(localId, key, CommandState.UNCERTAIN))
+        database.close()
+
+        val reopened = openDatabase()
+        try {
+            assertEquals(
+                LocalCommand(localId, key, CommandState.UNCERTAIN),
+                RoomCommandRepository(reopened).get(localId),
+            )
+        } finally {
+            reopened.close()
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun durableRepositoryRejectsIdempotencyKeyMutation() {
+        val database = openDatabase()
+        try {
+            val repository = RoomCommandRepository(database)
+            val command = LocalCommand(
+                UUID.randomUUID(),
+                IdempotencyKey("0123456789abcdef0123456789abcdef"),
+                CommandState.QUEUED,
+            )
+            repository.save(command)
+            repository.save(command.copy(idempotencyKey = IdempotencyKey("fedcba9876543210fedcba9876543210")))
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
     fun failedTransactionRollsBackEntireSyntheticWrite() {
         val database = openDatabase()
         try {
@@ -127,5 +187,6 @@ class SyntheticPilotDatabaseTest {
     ).addMigrations(
         SyntheticPilotDatabase.MIGRATION_1_2,
         SyntheticPilotDatabase.MIGRATION_2_3,
+        SyntheticPilotDatabase.MIGRATION_3_4,
     ).build()
 }

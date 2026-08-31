@@ -42,9 +42,10 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - El shell Compose conecta la captura HID con catálogo y Pricing sintéticos,
   acumula cantidades, permite editar/eliminar líneas y navega entre bienvenida,
   carrito, asistencia y cancelación. No crea ventas ni realiza llamadas de red.
-- La cola en memoria conserva `Idempotency-Key`, convierte timeout en
+- La cola de dominio conserva `Idempotency-Key`, convierte timeout en
   `uncertain` y consulta mediante una interfaz de reconciliación antes de
-  cualquier reenvío. Room y WorkManager todavía no están implementados.
+  cualquier reenvío. Room V4 implementa persistencia durable de su metadata;
+  WorkManager todavía no está implementado.
 - La política offline permite borradores puramente locales y niega toda
   operación remota sin capacidad vigente y verificada. Pagos, reembolsos,
   reversiones, liquidaciones, administración y fiscalidad permanecen siempre
@@ -72,6 +73,11 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Room V3 agrega sólo metadata sintética de snapshots y demuestra publicación
   atómica, rollback y preservación de la versión activa ante un rollback
   inválido. Las 5 pruebas instrumentadas V3 pasaron en el X-3566.
+- Room V4 incorpora un adapter durable de `CommandRepository` sin payload:
+  conserva UUID, clave idempotente y estado, y rechaza cualquier mutación de la
+  `Idempotency-Key` para un comando existente. Las 8 pruebas instrumentadas V4
+  pasaron en el X-3566 con Android 11, incluida la persistencia de `uncertain`
+  tras cerrar y reabrir la base.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 
