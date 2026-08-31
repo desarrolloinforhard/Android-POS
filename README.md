@@ -50,7 +50,9 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - El adapter WorkManager `piloto` agenda trabajo único con red conectada,
   política `KEEP` y backoff exponencial de 30 segundos. Requiere un delegado y
   una `WorkerFactory` explícitos; no está conectado a `app`, no define rutas y
-  no puede ejecutar transporte real por sí mismo.
+  no puede ejecutar transporte real por sí mismo. Sus 2 pruebas instrumentadas
+  pasaron en el X-3566 con Android 11: resultados del delegado y ausencia de
+  duplicación del trabajo pendiente.
 - La política offline permite borradores puramente locales y niega toda
   operación remota sin capacidad vigente y verificada. Pagos, reembolsos,
   reversiones, liquidaciones, administración y fiscalidad permanecen siempre

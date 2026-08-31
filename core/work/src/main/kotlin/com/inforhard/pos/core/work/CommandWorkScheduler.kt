@@ -5,13 +5,14 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 
 class CommandWorkScheduler(
     private val workManager: WorkManager,
 ) {
-    fun schedule() {
+    fun schedule(): Operation {
         val request = OneTimeWorkRequestBuilder<CommandSyncWorker>()
             .setConstraints(
                 Constraints.Builder()
@@ -25,7 +26,7 @@ class CommandWorkScheduler(
             )
             .build()
 
-        workManager.enqueueUniqueWork(
+        return workManager.enqueueUniqueWork(
             UNIQUE_WORK_NAME,
             ExistingWorkPolicy.KEEP,
             request,

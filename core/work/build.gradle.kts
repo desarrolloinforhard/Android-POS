@@ -7,7 +7,10 @@ android {
     namespace = "com.inforhard.pos.core.work"
     compileSdk = 35
 
-    defaultConfig { minSdk = 25 }
+    defaultConfig {
+        minSdk = 25
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -20,4 +23,7 @@ android {
 dependencies {
     implementation(project(":core:sync"))
     implementation(libs.androidx.work.runtime)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.work.testing)
 }

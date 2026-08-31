@@ -26,3 +26,13 @@ una migración explícita y verificada del toolchain.
 Permanecen `pendiente de confirmar` el límite de intentos, jitter, ventanas,
 política de batería, respuesta a revocación y resultados de reconciliación.
 Nada de este ADR habilita integración real, venta, pago o fiscalidad.
+
+## Evidencia
+
+- Compilación completa y lint: correctos.
+- Pruebas instrumentadas en X-3566 con Android 11: 2/2 correctas.
+- `COMPLETE`, `RETRY` y `BLOCKED` se traducen a resultados WorkManager sin
+  conocimiento de transporte.
+- Dos schedules consecutivos con `KEEP` conservan un único trabajo pendiente.
+- El APK temporal se retiró y los ajustes del verificador de instalación se
+  restauraron al estado previo.
