@@ -70,6 +70,7 @@ No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 - [Estado y plan de autoservicio API-first](docs/coordinacion-autoservicio-api-first.md)
 - [Necesidades pendientes de API Platform](docs/necesidades-api-platform.md)
 - [Flujo de arquitectura Draw.io](docs/flujo-autoservicio-api-first.drawio)
+- [Matriz de Pricing determinista](docs/matriz-pricing-determinista.md)
 
 Los documentos publicados son una instantánea informativa. El registro oficial
 continúa en `J:\Proyectos\context\inforhard-pos-android`; ningún nombre interno,
