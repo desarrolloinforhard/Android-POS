@@ -15,4 +15,7 @@ interface LocalCommandDao {
 
     @Query("SELECT * FROM local_commands WHERE state = :state ORDER BY localId")
     fun findByState(state: String): List<LocalCommandEntity>
+
+    @Query("UPDATE local_commands SET state = :recoveredState WHERE state = :interruptedState")
+    fun recoverInterruptedSending(interruptedState: String, recoveredState: String): Int
 }

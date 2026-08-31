@@ -25,6 +25,16 @@ class RoomCommandRepository(
     override fun findByState(state: CommandState): List<LocalCommand> =
         database.commands().findByState(state.name).map { it.toModel() }
 
+    override fun recoverInterruptedSending(): List<LocalCommand> =
+        database.runInTransaction<List<LocalCommand>> {
+            val interrupted = database.commands().findByState(CommandState.SENDING.name)
+            database.commands().recoverInterruptedSending(
+                interruptedState = CommandState.SENDING.name,
+                recoveredState = CommandState.UNCERTAIN.name,
+            )
+            interrupted.map { it.copy(state = CommandState.UNCERTAIN.name).toModel() }
+        }
+
     private fun LocalCommand.toEntity() = LocalCommandEntity(
         localId = localId.toString(),
         idempotencyKey = idempotencyKey.value,

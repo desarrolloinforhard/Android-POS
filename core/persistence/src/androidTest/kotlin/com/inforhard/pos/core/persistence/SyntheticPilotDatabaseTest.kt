@@ -163,6 +163,36 @@ class SyntheticPilotDatabaseTest {
     }
 
     @Test
+    fun interruptedSendingRecoversAsUncertainAfterProcessRestart() {
+        val localId = UUID.randomUUID()
+        val alreadyUncertainId = UUID.randomUUID()
+        val key = IdempotencyKey("0123456789abcdef0123456789abcdef")
+        val database = openDatabase()
+        RoomCommandRepository(database).apply {
+            save(LocalCommand(localId, key, CommandState.SENDING))
+            save(LocalCommand(alreadyUncertainId, key, CommandState.UNCERTAIN))
+        }
+        database.close()
+
+        val reopened = openDatabase()
+        try {
+            val repository = RoomCommandRepository(reopened)
+
+            assertEquals(
+                listOf(LocalCommand(localId, key, CommandState.UNCERTAIN)),
+                repository.recoverInterruptedSending(),
+            )
+            assertEquals(LocalCommand(localId, key, CommandState.UNCERTAIN), repository.get(localId))
+            assertEquals(
+                LocalCommand(alreadyUncertainId, key, CommandState.UNCERTAIN),
+                repository.get(alreadyUncertainId),
+            )
+        } finally {
+            reopened.close()
+        }
+    }
+
+    @Test
     fun failedTransactionRollsBackEntireSyntheticWrite() {
         val database = openDatabase()
         try {

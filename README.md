@@ -75,9 +75,10 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
   inválido. Las 5 pruebas instrumentadas V3 pasaron en el X-3566.
 - Room V4 incorpora un adapter durable de `CommandRepository` sin payload:
   conserva UUID, clave idempotente y estado, y rechaza cualquier mutación de la
-  `Idempotency-Key` para un comando existente. Las 8 pruebas instrumentadas V4
-  pasaron en el X-3566 con Android 11, incluida la persistencia de `uncertain`
-  tras cerrar y reabrir la base.
+  `Idempotency-Key` para un comando existente. Al reiniciar el proceso, todo
+  comando interrumpido en `SENDING` pasa atómicamente a `UNCERTAIN`; nunca se
+  reencola ni se rechaza automáticamente. Las 9 pruebas instrumentadas V4
+  pasaron en el X-3566 con Android 11.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 

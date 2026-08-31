@@ -68,6 +68,19 @@ class CommandCoordinatorTest {
         )
     }
 
+    @Test
+    fun interruptedSendingRecoversAsUncertainWithoutChangingIdentity() {
+        val repository = InMemoryCommandRepository()
+        val interrupted = command.copy(state = CommandState.SENDING)
+        repository.save(interrupted)
+
+        val recovered = repository.recoverInterruptedSending()
+
+        assertEquals(listOf(interrupted.copy(state = CommandState.UNCERTAIN)), recovered)
+        assertEquals(command.idempotencyKey, recovered.single().idempotencyKey)
+        assertEquals(CommandState.UNCERTAIN, repository.get(command.localId)?.state)
+    }
+
     private fun coordinator(
         repository: CommandRepository,
         sendResult: TransportResult,

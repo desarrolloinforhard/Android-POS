@@ -37,7 +37,10 @@ o secreto persistido.
   productivos. Las 5 pruebas V3 pasaron en X-3566 con Android 11.
 - Incremento V4: outbox durable sin payload comercial; sólo UUID local,
   `Idempotency-Key` y estado. La misma clave no puede mutar y `uncertain` debe
-  sobrevivir el cierre y reapertura de la base: `implementado`. Las 8 pruebas
-  instrumentadas V4 pasaron en X-3566 con Android 11. Para destrabar el
+  sobrevivir el cierre y reapertura de la base: `implementado`. La recuperación
+  de proceso convierte transaccionalmente `SENDING` en `UNCERTAIN`, conserva la
+  clave estable y no incluye comandos previamente inciertos en el resultado de
+  recuperación. Las 9 pruebas instrumentadas V4 pasaron en X-3566 con Android
+  11. Para destrabar el
   verificador externo del firmware se desactivó sólo durante la instalación
   ADB y sus ajustes se restauraron al estado previo; el APK temporal se retiró.

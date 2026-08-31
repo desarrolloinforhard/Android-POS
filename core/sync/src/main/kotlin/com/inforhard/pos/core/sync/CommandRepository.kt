@@ -8,6 +8,7 @@ interface CommandRepository {
     fun save(command: LocalCommand)
     fun get(localId: UUID): LocalCommand?
     fun findByState(state: CommandState): List<LocalCommand>
+    fun recoverInterruptedSending(): List<LocalCommand>
 }
 
 class InMemoryCommandRepository : CommandRepository {
@@ -28,4 +29,14 @@ class InMemoryCommandRepository : CommandRepository {
     @Synchronized
     override fun findByState(state: CommandState): List<LocalCommand> =
         commands.values.filter { it.state == state }
+
+    @Synchronized
+    override fun recoverInterruptedSending(): List<LocalCommand> =
+        commands.values
+            .filter { it.state == CommandState.SENDING }
+            .map { command ->
+                command.copy(state = CommandState.UNCERTAIN).also { recovered ->
+                    commands[recovered.localId] = recovered
+                }
+            }
 }
