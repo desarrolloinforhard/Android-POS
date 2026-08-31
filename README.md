@@ -40,6 +40,9 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Scanner HID/teclado encapsulado detrás de una interfaz, con terminación por
   Enter, cancelación y límite defensivo. La compatibilidad definitiva debe
   validarse en los equipos reales.
+- En un X-3566 se comprobó un scanner Newtologic 7810SP expuesto por Android
+  como teclado USB HID alfanumérico. La captura end-to-end de un barcode real
+  continúa pendiente de confirmar.
 - El shell Compose conecta la captura HID con catálogo y Pricing sintéticos,
   acumula cantidades, permite editar/eliminar líneas y navega entre bienvenida,
   carrito, asistencia y cancelación. No crea ventas ni realiza llamadas de red.
@@ -97,6 +100,7 @@ No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 - [Matriz de Pricing determinista](docs/matriz-pricing-determinista.md)
 - [ADR-003: Room, cifrado y migraciones](docs/adr-003-room-cifrado-migraciones.md)
 - [ADR-004: WorkManager y reintentos](docs/adr-004-workmanager-reintentos.md)
+- [Inventario de hardware X-3566](docs/hardware-x3566-inventory.md)
 - [Flujo de persistencia local A3](docs/persistencia-local-a3.drawio)
 
 Los documentos publicados son una instantánea informativa. El registro oficial
