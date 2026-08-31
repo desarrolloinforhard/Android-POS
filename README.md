@@ -38,8 +38,9 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Scanner HID/teclado encapsulado detrás de una interfaz, con terminación por
   Enter, cancelación y límite defensivo. La compatibilidad definitiva debe
   validarse en los equipos reales.
-- El shell Compose recibe la captura HID y muestra el barcode solamente como
-  evidencia local. No ejecuta lookup, Pricing, venta ni llamadas de red.
+- El shell Compose conecta la captura HID con catálogo y Pricing sintéticos,
+  acumula cantidades, permite editar/eliminar líneas y navega entre bienvenida,
+  carrito, asistencia y cancelación. No crea ventas ni realiza llamadas de red.
 - La cola en memoria conserva `Idempotency-Key`, convierte timeout en
   `uncertain` y consulta mediante una interfaz de reconciliación antes de
   cualquier reenvío. Room y WorkManager todavía no están implementados.
@@ -53,6 +54,8 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Modelos candidatos de catálogo, carrito y Pricing viven sólo en el dominio
   Android. Un catálogo fixture y un motor fake recalculan el carrito completo,
   acumulan scans por producto y rechazan precedencias ambiguas.
+- El estado de conectividad se muestra como evidencia local y no concede
+  capacidades. Asistencia y cancelación son flujos locales sin backend.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 

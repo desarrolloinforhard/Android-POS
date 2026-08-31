@@ -2,27 +2,42 @@ package com.inforhard.pos
 
 import com.inforhard.pos.core.hardware.ScanResult
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PosShellControllerTest {
-    @Test
-    fun barcodeIsDisplayedOnlyAsLocalCapture() {
-        val controller = PosShellController()
-
-        controller.onScanResult(ScanResult.Barcode("7791234567890"))
-
-        assertEquals("7791234567890", controller.state.lastBarcode)
-        assertEquals("Captura completa; sin consulta comercial", controller.state.scannerMessage)
+    @Test fun repeatedScansAccumulateAndRepriceWholeCart() {
+        val controller = PosShellController().also { it.start() }
+        repeat(3) { controller.onScanResult(ScanResult.Barcode("7790000000011")) }
+        assertEquals(1, controller.state.cart.items.size)
+        assertEquals(3, controller.state.cart.items.single().quantity)
+        assertEquals(375_00, controller.state.total.minorUnits)
     }
 
-    @Test
-    fun cancelledScanDoesNotCreateBarcode() {
-        val controller = PosShellController()
+    @Test fun unknownBarcodeDoesNotChangeCart() {
+        val controller = PosShellController().also { it.start() }
+        controller.onScanResult(ScanResult.Barcode("unknown"))
+        assertTrue(controller.state.cart.items.isEmpty())
+        assertEquals("Producto no encontrado en el catálogo local", controller.state.scannerMessage)
+    }
 
-        controller.onScanResult(ScanResult.Cancelled)
+    @Test fun assistanceReturnsToSameCart() {
+        val controller = PosShellController().also { it.start() }
+        controller.onScanResult(ScanResult.Barcode("7790000000028"))
+        controller.requestAssistance()
+        assertEquals(PosDestination.ASSISTANCE, controller.state.destination)
+        controller.dismissAssistance()
+        assertEquals(PosDestination.CART, controller.state.destination)
+        assertEquals(1, controller.state.cart.items.size)
+    }
 
-        assertNull(controller.state.lastBarcode)
-        assertEquals("Lectura descartada", controller.state.scannerMessage)
+    @Test fun confirmedCancellationClearsDraftAndReturnsHome() {
+        val controller = PosShellController().also { it.start() }
+        controller.onScanResult(ScanResult.Barcode("7790000000035"))
+        controller.requestCancellation()
+        controller.confirmCancellation()
+        assertEquals(PosDestination.WELCOME, controller.state.destination)
+        assertTrue(controller.state.cart.items.isEmpty())
+        assertEquals(0, controller.state.total.minorUnits)
     }
 }
