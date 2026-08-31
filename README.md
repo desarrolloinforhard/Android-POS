@@ -69,6 +69,9 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Las dos pruebas Room fueron ejecutadas correctamente en el X-3566: migración
   V1→V2 sin pérdida y rollback transaccional. Package Manager requirió instalar
   el APK en modo ADB no streaming; el paquete temporal se retiró al finalizar.
+- Room V3 agrega sólo metadata sintética de snapshots y demuestra publicación
+  atómica, rollback y preservación de la versión activa ante un rollback
+  inválido. Las 5 pruebas instrumentadas V3 pasaron en el X-3566.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 

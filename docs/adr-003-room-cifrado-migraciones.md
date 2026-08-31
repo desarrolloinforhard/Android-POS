@@ -32,3 +32,6 @@ o secreto persistido.
 - Ejecución Room en X-3566 con Android 11: `implementado`; 2/2 pruebas correctas.
   Package Manager requirió instalación ADB no streaming y el paquete temporal
   se retiró al finalizar.
+- Base V3 con metadata de snapshots exclusivamente sintética, publicación
+  atómica y rollback local: `implementado`; no representa catálogo ni Pricing
+  productivos. Las 5 pruebas V3 pasaron en X-3566 con Android 11.
