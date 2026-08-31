@@ -55,3 +55,13 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
   acumulan scans por producto y rechazan precedencias ambiguas.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
+
+## Documentación de coordinación
+
+- [Estado y plan de autoservicio API-first](docs/coordinacion-autoservicio-api-first.md)
+- [Necesidades pendientes de API Platform](docs/necesidades-api-platform.md)
+- [Flujo de arquitectura Draw.io](docs/flujo-autoservicio-api-first.drawio)
+
+Los documentos publicados son una instantánea informativa. El registro oficial
+continúa en `J:\Proyectos\context\inforhard-pos-android`; ningún nombre interno,
+modelo candidato o necesidad documentada constituye un contrato HTTP aprobado.
