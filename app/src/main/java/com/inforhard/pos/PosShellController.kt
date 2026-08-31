@@ -16,6 +16,7 @@ data class PosShellState(
     val connectivity: ConnectivityState = ConnectivityState.OFFLINE,
     val scannerMessage: String = "Iniciá para escanear productos",
     val pricingMessage: String? = null,
+    val inactivityRevision: Long = 0,
 )
 
 class PosShellController(
@@ -26,10 +27,11 @@ class PosShellController(
     var state by mutableStateOf(PosShellState())
         private set
 
-    fun start() { state = state.copy(destination = PosDestination.CART, scannerMessage = "Escaneá un producto") }
+    fun start() { state = state.copy(destination = PosDestination.CART, scannerMessage = "Escaneá un producto").withActivity() }
 
     fun onScanResult(result: ScanResult) {
         if (state.destination != PosDestination.CART) return
+        state = state.withActivity()
         when (result) {
             ScanResult.Collecting -> state = state.copy(scannerMessage = "Leyendo…")
             ScanResult.Ignored -> Unit
@@ -39,27 +41,37 @@ class PosShellController(
     }
 
     fun increment(productId: String) {
+        state = state.withActivity()
         val item = state.cart.items.firstOrNull { it.productId == productId } ?: return
         applyEvaluation(cartService.changeQuantity(state.cart, productId, item.quantity + 1, pricingContext))
     }
 
     fun decrement(productId: String) {
+        state = state.withActivity()
         val item = state.cart.items.firstOrNull { it.productId == productId } ?: return
         if (item.quantity == 1) remove(productId)
         else applyEvaluation(cartService.changeQuantity(state.cart, productId, item.quantity - 1, pricingContext))
     }
 
     fun remove(productId: String) {
+        state = state.withActivity()
         if (state.cart.items.any { it.productId == productId }) {
             applyEvaluation(cartService.remove(state.cart, productId, pricingContext))
         }
     }
 
-    fun requestAssistance() { state = state.copy(destination = PosDestination.ASSISTANCE) }
-    fun dismissAssistance() { state = state.copy(destination = PosDestination.CART) }
-    fun requestCancellation() { state = state.copy(destination = PosDestination.CANCEL_CONFIRMATION) }
-    fun keepShopping() { state = state.copy(destination = PosDestination.CART) }
+    fun requestAssistance() { state = state.copy(destination = PosDestination.ASSISTANCE).withActivity() }
+    fun dismissAssistance() { state = state.copy(destination = PosDestination.CART).withActivity() }
+    fun requestCancellation() { state = state.copy(destination = PosDestination.CANCEL_CONFIRMATION).withActivity() }
+    fun keepShopping() { state = state.copy(destination = PosDestination.CART).withActivity() }
     fun confirmCancellation() { state = PosShellState(scannerMessage = "Operación local cancelada") }
+
+    fun onInactivityTimeout(expectedRevision: Long) {
+        if (state.destination == PosDestination.WELCOME || state.inactivityRevision != expectedRevision) return
+        state = PosShellState(scannerMessage = "Sesión local cerrada por inactividad")
+    }
+
+    private fun PosShellState.withActivity() = copy(inactivityRevision = inactivityRevision + 1)
 
     private fun onBarcode(barcode: String) {
         when (val lookup = catalog.lookup(barcode)) {

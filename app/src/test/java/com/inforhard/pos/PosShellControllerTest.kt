@@ -40,4 +40,19 @@ class PosShellControllerTest {
         assertTrue(controller.state.cart.items.isEmpty())
         assertEquals(0, controller.state.total.minorUnits)
     }
+
+    @Test fun inactivityClosesOnlyMatchingActiveRevision() {
+        val controller = PosShellController().also { it.start() }
+        controller.onScanResult(ScanResult.Barcode("7790000000035"))
+        val staleRevision = controller.state.inactivityRevision
+        controller.increment("fixture-soap")
+
+        controller.onInactivityTimeout(staleRevision)
+        assertEquals(PosDestination.CART, controller.state.destination)
+
+        controller.onInactivityTimeout(controller.state.inactivityRevision)
+        assertEquals(PosDestination.WELCOME, controller.state.destination)
+        assertTrue(controller.state.cart.items.isEmpty())
+        assertEquals("Sesión local cerrada por inactividad", controller.state.scannerMessage)
+    }
 }

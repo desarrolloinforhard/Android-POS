@@ -56,6 +56,12 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
   acumulan scans por producto y rechazan precedencias ambiguas.
 - El estado de conectividad se muestra como evidencia local y no concede
   capacidades. Asistencia y cancelación son flujos locales sin backend.
+- Un timeout lógico de inactividad vuelve a bienvenida y elimina sólo el
+  carrito en memoria. Una revisión de actividad evita que timers obsoletos
+  cierren una sesión que tuvo interacción posterior.
+- Las pruebas instrumentadas Compose cubren asistencia, cancelación y timeout;
+  las dos pruebas fueron ejecutadas correctamente en un terminal `X-3566` con
+  Android 11. La validación del inventario completo de hardware sigue pendiente.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 
