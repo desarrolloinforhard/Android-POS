@@ -66,9 +66,9 @@ Cliente Android POS de Inforhard en etapa de laboratorio local.
 - Room está incorporado sólo como spike `piloto`: entidad sintética, esquema
   exportado, migración V1→V2 y rollback transaccional. No se conecta todavía a
   la app ni permite persistir secretos o payloads comerciales.
-- La ejecución de las pruebas Room en el X-3566 está pendiente: el Package
-  Manager del terminal no completó la instalación, aunque el APK de pruebas,
-  la compilación completa y lint finalizaron correctamente.
+- Las dos pruebas Room fueron ejecutadas correctamente en el X-3566: migración
+  V1→V2 sin pérdida y rollback transaccional. Package Manager requirió instalar
+  el APK en modo ADB no streaming; el paquete temporal se retiró al finalizar.
 
 No se incluyen ventas, precios, pagos, fiscalidad ni tablas comerciales.
 

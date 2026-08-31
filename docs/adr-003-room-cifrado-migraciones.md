@@ -29,5 +29,6 @@ o secreto persistido.
 - Esquema V2 exportado y APK de pruebas instrumentadas: `implementado`.
 - Migración V1→V2 y rollback transaccional: `implementado` en pruebas.
 - Compilación completa, pruebas JVM y lint: comprobados.
-- Ejecución Room en X-3566: pendiente de confirmar; Package Manager no completó
-  la instalación del APK de pruebas. No se reinició ni alteró el terminal.
+- Ejecución Room en X-3566 con Android 11: `implementado`; 2/2 pruebas correctas.
+  Package Manager requirió instalación ADB no streaming y el paquete temporal
+  se retiró al finalizar.
