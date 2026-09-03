@@ -1,5 +1,6 @@
 package com.inforhard.pos
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
@@ -26,17 +27,27 @@ private const val KIOSK_INACTIVITY_TIMEOUT_MILLIS = 60_000L
 
 class MainActivity : ComponentActivity() {
     private val shellController = PosShellController()
-    private val scannerAdapter = AndroidHidKeyAdapter(HidBarcodeScanner())
+    private val scannerRouter = AndroidHidKeyRouter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { PosApp(shellController.state, shellController) }
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        val result = scannerAdapter.onKeyEvent(event)
-        shellController.onScanResult(result)
-        return if (result == ScanResult.Ignored) super.onKeyDown(keyCode, event) else true
+    // Public Activity hook; this AndroidX version marks its override as library-restricted.
+    @SuppressLint("RestrictedApi")
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (scannerRouter.dispatch(
+                event,
+                scanEnabled = shellController.state.destination == PosDestination.CART,
+                onResult = shellController::onScanResult,
+            )) return true
+        return super.dispatchKeyEvent(event)
+    }
+
+    override fun onPause() {
+        scannerRouter.reset()
+        super.onPause()
     }
 }
 

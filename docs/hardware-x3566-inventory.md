@@ -66,3 +66,18 @@ No se habilitan endpoints, ventas, pagos, fiscalidad ni operación productiva.
 - El valor capturado no pertenece al catálogo fixture de la app. No se agregó
   un producto ni se asignó un precio ficticio a ese código.
 - La captura terminó y no dejó un lector de eventos activo.
+
+## Corrección de foco HID — 2026-09-03
+
+- Estado: `piloto`.
+- Usuario reporta agua agregada en primera lectura y asistencia en la tercera.
+- Se sustituye onKeyDown por dispatchKeyEvent y AndroidHidKeyRouter, antes de
+  Compose. Consume DOWN/UP del scanner y conserva Enter aislado para navegación.
+- Unitarias, lint y compilación debug/test completados. Suite UI en X-3566:
+  4/4, incluyendo tres secuencias con asistencia enfocada, una línea de agua,
+  cantidad 3 y total fixture ARS 375,00; Enter aislado conserva asistencia.
+- Validación física posterior confirmada por el usuario con capturas sucesivas:
+  2 aguas / ARS 300,00 y 3 aguas / ARS 375,00, una línea y sin abrir asistencia.
+  Caso reportado comprobado en este terminal y fixture; otros lectores y
+  escenarios pendientes de confirmar. APK debug actualizado sin cambiar seguridad.
+- Detalle oficial: contexto Android, relevamientos/correccion-foco-scanner-2026-09-03.md.
