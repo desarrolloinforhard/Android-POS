@@ -8,6 +8,11 @@ import com.inforhard.pos.core.model.CommandState
 import com.inforhard.pos.core.model.IdempotencyKey
 import com.inforhard.pos.core.model.LocalCommand
 import java.util.UUID
+import com.inforhard.pos.core.sync.CommandCoordinator
+import com.inforhard.pos.core.sync.CommandDispatchPlanner
+import com.inforhard.pos.core.network.CommandTransport
+import com.inforhard.pos.core.network.ReconciliationTransport
+import com.inforhard.pos.core.network.TransportResult
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -209,6 +214,70 @@ class SyntheticPilotDatabaseTest {
             database.close()
         }
     }
+
+    @Test
+    fun reopenedQueueRequiresReconciliationBeforeSendingOtherCommands() {
+        val interrupted = LocalCommand(UUID.randomUUID(),
+            IdempotencyKey("0123456789abcdef0123456789abcdef"), CommandState.SENDING)
+        val queued = LocalCommand(UUID.randomUUID(),
+            IdempotencyKey("fedcba9876543210fedcba9876543210"), CommandState.QUEUED)
+        val initial = openDatabase()
+        try {
+            RoomCommandRepository(initial).apply { save(interrupted); save(queued) }
+        } finally { initial.close() }
+
+        val reopened = openDatabase()
+        try {
+            val repository = RoomCommandRepository(reopened)
+            val planner = CommandDispatchPlanner(repository)
+            val sent = mutableListOf<LocalCommand>()
+            val reconciled = mutableListOf<LocalCommand>()
+            var answer: TransportResult = TransportResult.Uncertain
+            val coordinator = CommandCoordinator(repository,
+                CommandTransport {
+                    assertEquals(CommandState.SENDING, repository.get(it.localId)?.state)
+                    sent.add(it)
+                    TransportResult.Acknowledged("synthetic-send")
+                },
+                ReconciliationTransport {
+                    reconciled.add(it)
+                    answer
+                })
+
+            val firstPlan = planner.planAfterProcessStart()
+            val uncertain = interrupted.copy(state = CommandState.UNCERTAIN)
+            assertEquals(listOf(uncertain), firstPlan.reconcileFirst)
+            assertEquals(emptyList<LocalCommand>(), firstPlan.sendQueued)
+            assertEquals(queued, repository.get(queued.localId))
+            assertEquals(uncertain, coordinator.reconcileUncertain(firstPlan.reconcileFirst.single()))
+            val stillBlocked = planner.planAfterProcessStart()
+            assertEquals(listOf(uncertain), stillBlocked.reconcileFirst)
+            assertEquals(emptyList<LocalCommand>(), stillBlocked.sendQueued)
+            assertEquals(emptyList<LocalCommand>(), sent)
+
+            answer = TransportResult.Acknowledged("synthetic-reconcile")
+            coordinator.reconcileUncertain(stillBlocked.reconcileFirst.single())
+            val ready = planner.planAfterProcessStart()
+            assertEquals(emptyList<LocalCommand>(), ready.reconcileFirst)
+            assertEquals(listOf(queued), ready.sendQueued)
+            coordinator.sendQueued(ready.sendQueued.single())
+            assertEquals(listOf(queued.copy(state = CommandState.SENDING)), sent)
+            assertEquals(listOf(uncertain, uncertain), reconciled)
+            assertEquals(interrupted.copy(state = CommandState.RECONCILED), repository.get(interrupted.localId))
+            assertEquals(queued.copy(state = CommandState.ACKNOWLEDGED), repository.get(queued.localId))
+        } finally { reopened.close() }
+
+        val finalDatabase = openDatabase()
+        try {
+            val repository = RoomCommandRepository(finalDatabase)
+            assertEquals(interrupted.copy(state = CommandState.RECONCILED), repository.get(interrupted.localId))
+            assertEquals(queued.copy(state = CommandState.ACKNOWLEDGED), repository.get(queued.localId))
+            val plan = CommandDispatchPlanner(repository).planAfterProcessStart()
+            assertEquals(emptyList<LocalCommand>(), plan.reconcileFirst)
+            assertEquals(emptyList<LocalCommand>(), plan.sendQueued)
+        } finally { finalDatabase.close() }
+    }
+
 
     private fun openDatabase() = Room.databaseBuilder(
         context,

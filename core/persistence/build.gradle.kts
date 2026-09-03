@@ -36,5 +36,6 @@ dependencies {
     kapt(libs.androidx.room.compiler)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(project(":core:network"))
     androidTestImplementation(libs.androidx.test.espresso.core)
 }
