@@ -60,4 +60,61 @@ class ScannerFocusRegressionTest {
             ))
         }
     }
+
+    private fun scanWater() {
+        composeRule.runOnIdle {
+            KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD)
+                .getEvents("7790000000011".toCharArray())!!
+                .forEach { composeRule.activity.dispatchKeyEvent(it) }
+            enter()
+        }
+    }
+
+    private fun focusButton(text: String) {
+        InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB)
+        composeRule.onNodeWithText(text)
+            .performSemanticsAction(SemanticsActions.RequestFocus) { it() }
+            .assertIsFocused()
+    }
+
+    @Test
+    fun scanInAssistanceDoesNotReturnOrChangeCart() {
+        composeRule.onNodeWithTag("start_button").performClick()
+        repeat(2) { scanWater() }
+        composeRule.onNodeWithTag("assistance_button").performClick()
+        focusButton("Volver al carrito")
+        scanWater()
+        composeRule.onNodeWithTag("assistance_title").assertIsDisplayed()
+        // Ordinary keyboard navigation must still work after discarding a scan.
+        InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_ENTER)
+        composeRule.onNodeWithText("Cantidad: 2").assertIsDisplayed()
+        composeRule.onNodeWithText("Total local: ARS 300,00").assertIsDisplayed()
+        scanWater()
+        composeRule.onNodeWithText("Cantidad: 3").assertIsDisplayed()
+        composeRule.onNodeWithText("Total local: ARS 375,00").assertIsDisplayed()
+    }
+
+    @Test
+    fun scanOnWelcomeDoesNotStartCart() {
+        focusButton("Comenzar")
+        scanWater()
+        composeRule.onNodeWithTag("start_button").assertIsDisplayed()
+        composeRule.onNodeWithTag("start_button").performClick()
+        composeRule.onNodeWithText("Total local: ARS 0,00").assertIsDisplayed()
+        scanWater()
+        composeRule.onNodeWithText("Cantidad: 1").assertIsDisplayed()
+    }
+
+    @Test
+    fun scanOnCancellationDoesNotConfirmOrChangeCart() {
+        composeRule.onNodeWithTag("start_button").performClick()
+        scanWater()
+        composeRule.onNodeWithTag("cancel_button").performClick()
+        focusButton("Sí, cancelar")
+        scanWater()
+        composeRule.onNodeWithTag("cancel_title").assertIsDisplayed()
+        composeRule.onNodeWithText("Seguir comprando").performClick()
+        composeRule.onNodeWithText("Cantidad: 1").assertIsDisplayed()
+        composeRule.onNodeWithText("Total local: ARS 150,00").assertIsDisplayed()
+    }
 }

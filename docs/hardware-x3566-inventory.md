@@ -100,3 +100,27 @@ No se habilitan endpoints, ventas, pagos, fiscalidad ni operación productiva.
 - Validación automatizada: 8/8 pruebas del controlador, lint y compilación debug
   correctos. APK instalado en el X-3566 sin modificar su seguridad.
 - Sin cambios de flujo arquitectónico, reglas de precios, API ni infraestructura.
+
+## Descarte de lecturas fuera del carrito — 2026-09-03
+
+- Estado: `piloto`.
+- Reporte físico del usuario: escanear en asistencia activa "Volver al carrito".
+- Causa en código: el router devolvía false al estar scanEnabled deshabilitado,
+  permitiendo que las teclas del lector llegaran al botón enfocado.
+- Corrección: capturar DOWN/UP en todas las pantallas; entregar resultados
+  únicamente para secuencias iniciadas y mantenidas dentro del carrito.
+  Fuera del carrito se descartan, incluido Enter; no se acumulan para después.
+- Se preserva Enter aislado de navegación. No se cambia el timeout ni se agregan
+  endpoints, reglas comerciales, SDK de hardware o configuración de seguridad.
+- Pruebas: unitarias de app y lint correctos; compilación debug/test correcta;
+  7/7 pruebas UI en X-3566 Android 11 (18,433 s), con foco de teclado explícito.
+  Nuevos casos: asistencia conserva 2 aguas / ARS 300,00 y próximo scan da
+  3 / ARS 375,00; bienvenida no inicia por lectura; cancelación no confirma
+  ni modifica el carrito por lectura. Son eventos sintéticos instrumentados.
+- APK debug actualizado. El usuario confirmó que la prueba física posterior
+  en asistencia ahora funciona; no aportó una nueva captura de esta repetición.
+  Validación física en bienvenida y cancelación: pendiente de confirmar;
+  esos escenarios cuentan con las pruebas instrumentadas descritas arriba.
+  La ronda anterior de asistencia sólo escaneaba después de volver al carrito
+  y no cubría el nuevo incidente.
+- Draw.io actualizado en código y contexto para representar el descarte.
