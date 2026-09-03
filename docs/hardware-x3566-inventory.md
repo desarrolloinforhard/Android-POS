@@ -29,8 +29,9 @@ porque StrongBox no está disponible.
 
 ## Bloqueos y pendientes de confirmar
 
-- No se capturó todavía un escaneo físico: sufijo Enter, layout, caracteres,
-  repetición, ráfaga y códigos soportados permanecen pendientes de confirmar.
+- Dos lecturas físicas numéricas con terminación Enter fueron capturadas el
+  2026-09-03 (detalle abajo). Layout alfanumérico, ráfagas rápidas, otras
+  simbologías y acumulación end-to-end en la app: pendiente de confirmar.
 - No había impresora USB conectada; protocolo, ancho, corte, cajón y encoding
   permanecen pendientes de confirmar.
 - No se detectaron balanza ni dispositivo de pago.
@@ -50,3 +51,18 @@ de un barcode real dentro de la app.
 
 No se habilitan endpoints, ventas, pagos, fiscalidad ni operación productiva.
 
+## Captura física del scanner — 2026-09-03
+
+- Estado: `actual`.
+- Captura acotada de 45 segundos sobre el dispositivo Newtologic identificado
+  en esta sesión como /dev/input/event3, sin inyectar eventos.
+- Dos secuencias KEY_DOWN reconstruyen el mismo valor: `7798320512886`.
+- El usuario confirmó que ese valor coincide con el número impreso.
+- Cada secuencia finaliza con KEY_ENTER DOWN/UP.
+- Desde el primer dígito hasta Enter DOWN: aproximadamente 72 y 84 ms.
+- Separación entre comienzos: 15,10 segundos; no demuestra lectura en ráfaga.
+- Evidencia limitada a eventos HID del sistema. No se comprobó traducción
+  Android Unicode ni recepción/lookup/acumulación en el carrito.
+- El valor capturado no pertenece al catálogo fixture de la app. No se agregó
+  un producto ni se asignó un precio ficticio a ese código.
+- La captura terminó y no dejó un lector de eventos activo.
