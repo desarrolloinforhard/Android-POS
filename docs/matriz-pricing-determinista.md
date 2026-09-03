@@ -17,3 +17,16 @@
 Los valores, nombres de reglas y productos son exclusivamente sintéticos. La
 precedencia comercial entre listas, umbrales y promociones permanece pendiente
 de confirmación por API Platform/Pricing.
+
+## Regresión de carrito mixto en el controlador — 2026-09-03
+
+- Estado: `implementado` para fixtures sintéticos.
+- Prueba: PosShellControllerTest.mixedCartAppliesGroupsAndRemainderWithoutChangingWater.
+- Reproduce 1 agua más 1, 2 y 3 cereales: totales ARS 470,00, 700,00
+  y 1.020,00; subtotales de cereal ARS 320,00, 550,00 y 870,00.
+- Comprueba dos líneas, cantidades, moneda ARS, ausencia de error de Pricing,
+  permanencia en carrito y conservación del ítem completo de agua.
+- Al eliminar cereal comprueba una sola línea de agua, ARS 150,00 y
+  el aviso "Cereal eliminado".
+- Validación: :app:testDebugUnitTest correcto; suite del controlador 9/9.
+- Prueba JVM, no prueba nueva de UI ni de hardware. No cambian reglas ni APK.

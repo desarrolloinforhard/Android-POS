@@ -6,6 +6,32 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PosShellControllerTest {
+    @Test fun mixedCartAppliesGroupsAndRemainderWithoutChangingWater() {
+        val controller = PosShellController().also { it.start() }
+        controller.onScanResult(ScanResult.Barcode("7790000000011"))
+        val waterBefore = controller.state.cart.items.single()
+        val expectedAmounts = listOf(320_00L to 470_00L, 550_00L to 700_00L, 870_00L to 1020_00L)
+
+        expectedAmounts.forEachIndexed { index, (cerealSubtotal, cartTotal) ->
+            controller.onScanResult(ScanResult.Barcode("7790000000028"))
+            assertEquals(2, controller.state.cart.items.size)
+            assertEquals(waterBefore, controller.state.cart.items.single { it.productId == "fixture-water" })
+            val cereal = controller.state.cart.items.single { it.productId == "fixture-cereal" }
+            assertEquals(index + 1, cereal.quantity)
+            assertEquals(cerealSubtotal, cereal.quote!!.lineTotal.minorUnits)
+            assertEquals("ARS", cereal.quote!!.lineTotal.currencyCode)
+            assertEquals(cartTotal, controller.state.total.minorUnits)
+            assertEquals("ARS", controller.state.total.currencyCode)
+            assertEquals(PosDestination.CART, controller.state.destination)
+            assertEquals(null, controller.state.pricingMessage)
+        }
+
+        controller.remove("fixture-cereal")
+        assertEquals(listOf(waterBefore), controller.state.cart.items)
+        assertEquals(150_00L, controller.state.total.minorUnits)
+        assertEquals("Cereal eliminado", controller.state.scannerMessage)
+    }
+
     @Test fun removingLastItemUpdatesMessageAndRescanStartsAtOne() {
         val controller = PosShellController().also { it.start() }
         repeat(2) { controller.onScanResult(ScanResult.Barcode("7790000000011")) }
