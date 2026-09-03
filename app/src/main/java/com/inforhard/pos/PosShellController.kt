@@ -55,9 +55,13 @@ class PosShellController(
 
     fun remove(productId: String) {
         state = state.withActivity()
-        if (state.cart.items.any { it.productId == productId }) {
-            applyEvaluation(cartService.remove(state.cart, productId, pricingContext))
-        }
+        val item = state.cart.items.firstOrNull { it.productId == productId } ?: return
+        applyEvaluation(cartService.remove(state.cart, productId, pricingContext))
+        state = state.copy(scannerMessage = if (state.cart.items.isEmpty()) {
+            "Carrito vacío"
+        } else {
+            "${item.description} eliminado"
+        })
     }
 
     fun requestAssistance() { state = state.copy(destination = PosDestination.ASSISTANCE).withActivity() }

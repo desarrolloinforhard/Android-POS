@@ -81,3 +81,22 @@ No se habilitan endpoints, ventas, pagos, fiscalidad ni operación productiva.
   Caso reportado comprobado en este terminal y fixture; otros lectores y
   escenarios pendientes de confirmar. APK debug actualizado sin cambiar seguridad.
 - Detalle oficial: contexto Android, relevamientos/correccion-foco-scanner-2026-09-03.md.
+
+## Validación del carrito y aviso de eliminación — 2026-09-03
+
+- Estado: `piloto`.
+- Capturas del usuario confirman la secuencia 4 aguas / ARS 500,00,
+  3 / ARS 375,00 y 2 / ARS 300,00 con precios exclusivamente sintéticos.
+- Eliminar deja el carrito vacío / ARS 0,00; nuevo escaneo agrega una unidad
+  / ARS 150,00, sin recuperar la cantidad anterior.
+- Se observó un aviso obsoleto de producto agregado después de eliminar.
+- Corrección local: al quitar el último artículo, incluso con decremento a cero,
+  mostrar "Carrito vacío"; si quedan artículos, identificar el producto eliminado.
+- Tres pruebas de regresión cubren eliminación y nuevo escaneo, decremento final,
+  eliminación parcial y producto inexistente.
+- Comprobación física del aviso actualizado: confirmada por el usuario con
+  capturas de 1 agua / ARS 150,00 y posterior eliminación: "Carrito vacío",
+  total ARS 0,00, sin aviso anterior de producto agregado.
+- Validación automatizada: 8/8 pruebas del controlador, lint y compilación debug
+  correctos. APK instalado en el X-3566 sin modificar su seguridad.
+- Sin cambios de flujo arquitectónico, reglas de precios, API ni infraestructura.
