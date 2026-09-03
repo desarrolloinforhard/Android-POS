@@ -6,6 +6,68 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PosShellControllerTest {
+    @Test fun unknownBarcodePreservesExistingCartAndNextScanRecovers() {
+        val controller = PosShellController().also { it.start() }
+        controller.onScanResult(ScanResult.Barcode("7790000000011"))
+        val before = controller.state
+        controller.onScanResult(ScanResult.Barcode("unknown"))
+        assertEquals(before.cart, controller.state.cart)
+        assertEquals(before.total, controller.state.total)
+        assertEquals(PosDestination.CART, controller.state.destination)
+        assertEquals("Producto no encontrado en el catálogo local", controller.state.scannerMessage)
+
+        controller.onScanResult(ScanResult.Barcode("7790000000011"))
+        assertEquals(1, controller.state.cart.items.size)
+        assertEquals(2, controller.state.cart.items.single().quantity)
+        assertEquals(300_00L, controller.state.total.minorUnits)
+        assertEquals("Agua sin gas agregado", controller.state.scannerMessage)
+    }
+
+    @Test fun cancellationCanBeDismissedThenConfirmedWithoutRestoringOldCart() {
+        val controller = PosShellController().also { it.start() }
+        controller.onScanResult(ScanResult.Barcode("7790000000011"))
+        val before = controller.state
+        controller.requestCancellation()
+        assertEquals(PosDestination.CANCEL_CONFIRMATION, controller.state.destination)
+        controller.keepShopping()
+        assertEquals(PosDestination.CART, controller.state.destination)
+        assertEquals(before.cart, controller.state.cart)
+        assertEquals(before.total, controller.state.total)
+
+        controller.requestCancellation()
+        controller.confirmCancellation()
+        assertEquals(PosDestination.WELCOME, controller.state.destination)
+        assertEquals("Operación local cancelada", controller.state.scannerMessage)
+        controller.start()
+        assertEquals(PosDestination.CART, controller.state.destination)
+        assertTrue(controller.state.cart.items.isEmpty())
+        assertEquals(0L, controller.state.total.minorUnits)
+        controller.onScanResult(ScanResult.Barcode("7790000000011"))
+        assertEquals(1, controller.state.cart.items.size)
+        assertEquals(1, controller.state.cart.items.single().quantity)
+        assertEquals(150_00L, controller.state.total.minorUnits)
+    }
+
+    @Test fun repeatedScanResultsInAssistanceAreDiscardedNotDeferred() {
+        val controller = PosShellController().also { it.start() }
+        controller.onScanResult(ScanResult.Barcode("7790000000011"))
+        controller.requestAssistance()
+        val before = controller.state
+        repeat(5) {
+            controller.onScanResult(ScanResult.Collecting)
+            controller.onScanResult(ScanResult.Barcode("7790000000011"))
+            assertEquals(before, controller.state)
+        }
+        controller.dismissAssistance()
+        assertEquals(PosDestination.CART, controller.state.destination)
+        assertEquals(before.cart, controller.state.cart)
+        assertEquals(150_00L, controller.state.total.minorUnits)
+        controller.onScanResult(ScanResult.Barcode("7790000000011"))
+        assertEquals(1, controller.state.cart.items.size)
+        assertEquals(2, controller.state.cart.items.single().quantity)
+        assertEquals(300_00L, controller.state.total.minorUnits)
+    }
+
     @Test fun mixedCartAppliesGroupsAndRemainderWithoutChangingWater() {
         val controller = PosShellController().also { it.start() }
         controller.onScanResult(ScanResult.Barcode("7790000000011"))
